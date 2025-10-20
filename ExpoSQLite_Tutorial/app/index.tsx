@@ -12,7 +12,11 @@ import {
 import { deleteItem, fetchItems, insertItem, updateItem, type Item } from "../data/db";
 import ItemRow from "./components/ItemRow";
 
+
 export default function App() {
+
+  const [selectNames, setSelectedNames] = useState<string[]>([]); 
+  const [allNames, setAllNames] = useState<string[]>([]); 
   /**
    * Database Access
    *
@@ -76,6 +80,16 @@ export default function App() {
     }
   };
 
+   const loadAllNamesMine = async () => { 
+    try { 
+      const allItems = await fetchItems(db) 
+      const uniqueNames = Array.from(new Set(allItems.map(i => i.name))); 
+      setAllNames(uniqueNames); 
+    } catch (err) { 
+      console.log("Failled to load names", err); 
+    }
+  }; 
+ 
   /**
    * Save Item Function
    *
@@ -212,6 +226,16 @@ export default function App() {
     ]);
   };
 
+  const toggleName = (name: string) => { 
+    let newSelectedNames: string[];
+    if (selectNames.includes(name)) { 
+      newSelectedNames = selectNames.filter(n => n !== name); 
+    } else { 
+      newSelectedNames = [...selectNames, name]
+    }
+    setSelectedNames(newSelectedNames)
+    loadAllNamesMine()
+  }
 
   return (
     <View style={styles.container}>
@@ -281,6 +305,9 @@ export default function App() {
     </View>
   );
 }
+
+
+
 
 const styles = StyleSheet.create({
   container: {

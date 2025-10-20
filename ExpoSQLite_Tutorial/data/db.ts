@@ -128,6 +128,23 @@ export const deleteItem = async (db: SQLiteDatabase, id: number): Promise<void> 
   await db.runAsync("DELETE FROM items WHERE id = ?;", [id]);
 };
 
+ /** 
+   * Sort item function 
+   */
+export const sortItems = async (db: SQLiteDatabase, name: string): Promise<void> => { 
+  await db.runAsync("SELECT * FROM items WHERE name = ?;", [name])
+}
 
+export const fetchItemsName = async(db: SQLiteDatabase, filterNames?: string[]): Promise<Item[]> => { 
+  if(!filterNames || filterNames.length == 0) { 
+    return db.getAllAsync<Item>("SELECT * FROM items;"); 
+
+  }
+  const placeholders = filterNames.map(() => '?').join(','); 
+  const query = `SELECT * FROM items WHERE name IN (${placeholders});`; 
+
+  return db.getAllSync<Item>(query, filterNames); 
+
+}; 
 
  
